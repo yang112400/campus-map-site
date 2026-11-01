@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>乐骑 · 校园骑行路线</title>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=1" />
+<link rel="stylesheet" href="styles/real-map.css?v=1" />
+<link rel="stylesheet" href="styles/cycling.css?v=1" />
+</head>
+<body class="cycling-page">
+<div id="map"></div>
+
+<div id="ui">
+  <header class="panel" id="brand">
+    <h1>乐骑 <span>·</span> 校园骑行</h1>
+    <p>输入起点与终点 · 自动规划 ≥3 km 的操场骑行线</p>
+    <div class="tag">≥3 km · 途经操场 · 优先大路 · 不绕圈</div>
+    <div class="links">
+      <a href="real-map.html">步行导航</a>
+      <a href="index.html">模拟校园版</a>
+      <a href="b-package/3d.html">B 楼 2.5D</a>
+    </div>
+  </header>
+
+  <section class="panel" id="endpointPanel">
+    <div class="ep-card" id="startCard">
+      <div class="ep-head"><span class="dot start"></span><span class="role">起点</span></div>
+      <div class="ep-name" id="startName">点击地图选择</div>
+      <div class="ep-sub" id="startSub">—</div>
+      <select id="startSelect" aria-label="选择骑行起点"></select>
+    </div>
+    <div class="ep-card" id="endCard">
+      <div class="ep-head"><span class="dot end"></span><span class="role">终点</span></div>
+      <div class="ep-name" id="endName">点击地图选择</div>
+      <div class="ep-sub" id="endSub">—</div>
+      <select id="endSelect" aria-label="选择骑行终点"></select>
+    </div>
+    <div class="ep-actions">
+      <button id="btnSwap" type="button">交换起终点</button>
+      <button id="btnReset" type="button">清除重选</button>
+    </div>
+    <button id="btnPlan" class="plan-btn" type="button">生成乐骑路线</button>
+  </section>
+
+  <section class="panel" id="routeCard">
+    <div class="rc-top">
+      <div class="rc-stat"><div class="k">路线长度</div><div class="v" id="routeDist">—</div></div>
+      <div class="rc-stat"><div class="k">骑行约</div><div class="v" id="routeTime">—</div></div>
+      <div class="rc-stat"><div class="k">大路占比</div><div class="v" id="routeBig">—</div></div>
+    </div>
+    <div id="checks" class="checks"></div>
+    <div id="viaLine" class="via-line"></div>
+    <div id="warning" class="warning" hidden></div>
+    <div id="steps" class="steps"></div>
+    <div class="rc-actions">
+      <button id="btnAlt" type="button">换一条</button>
+      <button id="btnFit" type="button">看全程</button>
+    </div>
+  </section>
+
+  <div class="panel" id="legend">
+    <div class="legend-title">乐骑图例</div>
+    <div class="legend-row"><span class="swatch route"></span>本次乐骑路线</div>
+    <div class="legend-row"><span class="swatch ring"></span>乐骑主环（取其中一段）</div>
+    <div class="legend-row"><span class="swatch pg"></span>南/北操场</div>
+    <div class="legend-note">主环不闭合骑行，只沿选定方向走一段，避免绕圈。</div>
+  </div>
+
+  <div id="coord">经度 —，纬度 —</div>
+  <div id="credit">底图 © 西安电子科技大学 GIS · 路网 © OpenStreetMap contributors · 仅课程演示</div>
+  <div id="toast"></div>
+</div>
+
+<div id="loading">
+  <div class="loading-inner"><div class="spinner"></div><div>正在加载乐骑路网与校园底图…</div></div>
+</div>
+
+<script src="vendor/leaflet/leaflet.js?v=1"></script>
+<script src="data/real-pois.js?v=1"></script>
+<script src="data/cycling.js?v=1"></script>
+<script src="app/cycling-core.js?v=1"></script>
+<script src="app/cycling.js?v=1"></script>
+<script>
+(function () {
+  setTimeout(function () {
+    if (window.__CYCLING_READY__ || document.getElementById("bootError")) return;
+    var l = document.getElementById("loading");
+    if (l) {
+      l.style.display = "flex";
+      l.classList.remove("hide");
+      l.innerHTML = '<div class="loading-inner"><div>乐骑页面初始化超时</div>' +
+        '<div style="font-size:11px;color:#8d9aab">请用 Chrome/Edge 打开；底图需要联网，路网数据已本地内置</div></div>';
+    }
+  }, 8000);
+})();
+</script>
+</body>
+</html>

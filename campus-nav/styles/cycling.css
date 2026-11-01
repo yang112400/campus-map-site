@@ -1,0 +1,307 @@
+/* 乐骑模式：在真实 GIS 页样式基础上换成琥珀色骑行主题 */
+.cycling-page {
+  --accent: #f5a623;
+  --accent-soft: rgba(245, 166, 35, 0.14);
+  --panel: rgba(15, 18, 22, 0.88);
+  --panel-border: rgba(245, 166, 35, 0.12);
+  --radius: 14px;
+}
+
+.cycling-page #brand h1 span { color: var(--accent); }
+.cycling-page #brand .tag {
+  color: #ffd58a;
+  background: var(--accent-soft);
+  border-color: rgba(245, 166, 35, 0.3);
+}
+.cycling-page #brand .links a { color: #ffd58a; }
+
+.cycling-page .ep-card.active {
+  background: rgba(245, 166, 35, 0.07);
+  border-color: rgba(245, 166, 35, 0.42);
+}
+.cycling-page .ep-card select:focus { border-color: rgba(245, 166, 35, 0.6); }
+
+.plan-btn {
+  display: block;
+  width: calc(100% - 10px);
+  margin: 6px 5px 2px;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #231605;
+  background: linear-gradient(135deg, #ffc65c, #f59e0b);
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.28);
+  transition: filter 0.16s ease, transform 0.16s ease;
+}
+.plan-btn:hover { filter: brightness(1.06); }
+.plan-btn:active { transform: translateY(1px); }
+.plan-btn:disabled { opacity: 0.55; cursor: wait; }
+
+.plan-note {
+  padding: 6px 8px 4px;
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--faint);
+}
+
+/* ---------- 结果卡 ---------- */
+.cycling-page #routeCard {
+  width: 382px;
+  max-height: min(54vh, calc(100vh - 410px), 560px);
+  border-color: rgba(245, 166, 35, 0.16);
+}
+.cycling-page .rc-stat .v small { color: var(--muted); }
+.cycling-page #routeBig { color: #ffd58a; }
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 0 2px;
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 10.5px;
+  line-height: 1.2;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #b9c5d4;
+  background: rgba(255, 255, 255, 0.035);
+  white-space: nowrap;
+}
+.check.ok {
+  color: #b8f5da;
+  border-color: rgba(52, 211, 153, 0.3);
+  background: rgba(52, 211, 153, 0.08);
+}
+.check.warn {
+  color: #ffe0a3;
+  border-color: rgba(245, 166, 35, 0.35);
+  background: rgba(245, 166, 35, 0.09);
+}
+.check.bad {
+  color: #ffc4c4;
+  border-color: rgba(255, 107, 107, 0.32);
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.via-line {
+  padding: 4px 2px 2px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: #d7c39a;
+}
+.via-line b { color: #ffd58a; font-weight: 600; }
+
+.warning {
+  margin: 8px 0 2px;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #ffe1a8;
+  background: rgba(245, 166, 35, 0.09);
+  border: 1px solid rgba(245, 166, 35, 0.26);
+  border-radius: 8px;
+}
+.warning[hidden] { display: none; }
+
+.rc-actions {
+  display: flex;
+  gap: 7px;
+  padding: 8px 0 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.rc-actions button {
+  flex: 1;
+  padding: 8px 0;
+  font: inherit;
+  font-size: 11.5px;
+  color: #e8edf4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+.rc-actions button:hover {
+  background: rgba(245, 166, 35, 0.1);
+  border-color: rgba(245, 166, 35, 0.32);
+}
+.rc-actions button:disabled { opacity: 0.38; cursor: default; }
+
+/* ---------- 图例 ---------- */
+#legend {
+  position: absolute;
+  left: 24px;
+  bottom: 78px;
+  width: 220px;
+  padding: 12px 14px 11px;
+  font-size: 11px;
+  color: #aab7c7;
+}
+.legend-title {
+  margin-bottom: 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: #8d9aab;
+  text-transform: uppercase;
+}
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+.swatch { flex: none; width: 22px; height: 0; border-top: 3px solid #f59e0b; border-radius: 2px; }
+.swatch.route { border-top-color: #f97316; box-shadow: 0 0 8px rgba(249, 115, 22, 0.55); }
+.swatch.ring { border-top-style: dashed; border-top-color: rgba(245, 166, 35, 0.55); }
+.swatch.pg {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #f5a623;
+  border-radius: 50%;
+  background: rgba(245, 166, 35, 0.22);
+}
+.legend-note {
+  margin-top: 6px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 10px;
+  line-height: 1.5;
+  color: #6f7d8f;
+}
+
+/* ---------- Leaflet ---------- */
+path.cycling-glow { filter: blur(5px); }
+path.cycling-base { filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5)); }
+path.cycling-dash { animation: cyclingDash 1.3s linear infinite; }
+@keyframes cyclingDash { to { stroke-dashoffset: -30; } }
+
+path.ring-line {
+  stroke-dasharray: 3 9;
+  opacity: 0.38;
+}
+
+.pg-marker { background: transparent; border: 0; }
+.pg-marker .pg-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, calc(-100% - 12px));
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffe2ad;
+  white-space: nowrap;
+  background: rgba(35, 24, 8, 0.92);
+  border: 1px solid rgba(245, 166, 35, 0.55);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+.pg-marker .pg-stem {
+  position: absolute;
+  left: -1px;
+  top: -12px;
+  width: 2px;
+  height: 12px;
+  background: rgba(245, 166, 35, 0.6);
+}
+.pg-marker .pg-stem::after {
+  content: "";
+  position: absolute;
+  left: -3px;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f5a623;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.pg-circle { transition: fill-opacity 0.2s ease, stroke-opacity 0.2s ease; }
+
+/* ---------- Leaflet 提示 ---------- */
+.leaflet-tooltip.cycling-endpoint-tip {
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #eef4fb;
+  background: rgba(10, 15, 22, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+.leaflet-tooltip.cycling-endpoint-tip.start {
+  color: #c8f7e3;
+  border-color: rgba(52, 211, 153, 0.7);
+}
+.leaflet-tooltip.cycling-endpoint-tip.end {
+  color: #ffd9d9;
+  border-color: rgba(255, 107, 107, 0.7);
+}
+.leaflet-tooltip.cycling-endpoint-tip:before { display: none; }
+.leaflet-tooltip.station-tip {
+  padding: 2px 6px;
+  font-size: 10px;
+  color: #dbe6f3;
+  background: rgba(10, 15, 22, 0.88);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  border-radius: 5px;
+}
+.leaflet-tooltip.station-tip:before { display: none; }
+
+/* 站点小圆点 */
+.station-dot {
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
+}
+.station-dot.hit { filter: drop-shadow(0 0 7px rgba(245, 166, 35, 0.9)); }
+
+.cycling-page #coord,
+.cycling-page #credit {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1180px) {
+  .cycling-page #routeCard { width: 350px; }
+}
+@media (max-width: 1100px) {
+  #legend { left: 18px; width: 200px; }
+  .cycling-page #routeCard { width: 328px; }
+}
+@media (max-width: 900px) {
+  #legend { display: none; }
+}
+@media (max-width: 760px) {
+  .cycling-page #routeCard {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: 44vh;
+  }
+  .cycling-page #routeCard .rc-stat .v { font-size: 17px; }
+  .checks { gap: 4px; }
+  .check { padding: 3px 7px; font-size: 10px; }
+  .plan-note { display: none; }
+  #legend { display: none; }
+  .cycling-page #coord,
+  .cycling-page #credit { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  path.cycling-dash { animation: none; }
+  .plan-btn, .rc-actions button, .check, .pg-circle { transition: none; }
+}

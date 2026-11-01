@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>校园导航 · 真实 GIS 地图</title>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css?v=1" />
+<link rel="stylesheet" href="styles/real-map.css?v=3" />
+</head>
+<body>
+<div id="map"></div>
+
+<div id="ui">
+  <header class="panel" id="brand">
+    <h1>校园导航 <span>·</span> 真实 GIS 地图</h1>
+    <p>底图：西电 GIS 3D 瓦片 · 路径：校园路径接口</p>
+    <div class="tag">WGS-84 · 点击道路选点</div>
+    <div class="links">
+      <a href="cycling.html">乐骑模式</a>
+      <a href="b-package/3d.html">B 楼 2.5D</a>
+      <a href="index.html">模拟校园版</a>
+      <a href="https://gis.xidian.edu.cn/#/home?campus=21047" target="_blank" rel="noopener">打开 GIS 原站</a>
+    </div>
+  </header>
+
+  <section class="panel" id="endpointPanel">
+    <div class="ep-card" id="startCard">
+      <div class="ep-head"><span class="dot start"></span><span class="role">起点</span></div>
+      <div class="ep-name" id="startName">点击地图选择</div>
+      <div class="ep-sub" id="startSub">—</div>
+      <select id="startSelect" aria-label="选择起点"></select>
+    </div>
+    <div class="ep-card" id="endCard">
+      <div class="ep-head"><span class="dot end"></span><span class="role">终点</span></div>
+      <div class="ep-name" id="endName">点击地图选择</div>
+      <div class="ep-sub" id="endSub">—</div>
+      <select id="endSelect" aria-label="选择终点"></select>
+    </div>
+    <div class="ep-actions">
+      <button id="btnSwap" type="button">交换起终点</button>
+      <button id="btnReset" type="button">清除重选</button>
+    </div>
+  </section>
+
+  <section class="panel" id="routeCard">
+    <div class="rc-top">
+      <div class="rc-stat"><div class="k">总距离</div><div class="v" id="routeDist">—</div></div>
+      <div class="rc-stat"><div class="k">步行约</div><div class="v" id="routeTime">—</div></div>
+      <div class="rc-stat"><div class="k">路线</div><div class="v" id="routeKind">室外</div></div>
+    </div>
+    <div id="steps" class="steps"></div>
+  </section>
+
+  <div class="panel" id="indoorBar">
+    <div class="ib-text"><b id="indoorTitle">A栋</b><span id="indoorSub">室内图 · 外部页面</span></div>
+    <select id="indoorFloor" aria-label="选择楼层"></select>
+    <button id="btnIndoor" type="button">打开室内图</button>
+    <a id="indoorNew" href="#" target="_blank" rel="noopener">新窗口</a>
+  </div>
+
+  <div class="panel" id="bIndoorBar">
+    <div class="ib-text"><b>B楼 · 7层室内</b><span>选入口和教室，进入 B 楼路线</span></div>
+    <select id="bEntranceSelect" aria-label="选择 B 楼入口"></select>
+    <select id="bRoomSelect" aria-label="选择 B 楼教室"></select>
+    <button id="btnBIndoor" type="button">进入 B 楼室内</button>
+  </div>
+  <div id="coord">经纬度 —</div>
+  <div id="credit">底图 © 西安电子科技大学 GIS · 仅课程演示</div>
+  <div id="toast"></div>
+</div>
+
+<div id="indoorModal" aria-hidden="true">
+  <div class="im-card">
+    <div class="im-head">
+      <div class="im-title"><b id="imTitle">A栋 · 室内图</b><span id="imSub">campus-map-site · 需要联网</span></div>
+      <div class="im-actions">
+        <select id="imFloor" aria-label="切换楼层"></select>
+        <a id="imNew" href="#" target="_blank" rel="noopener">新窗口打开</a>
+        <button id="imClose" type="button">关闭</button>
+      </div>
+    </div>
+    <iframe id="imFrame" title="室内导航图" referrerpolicy="no-referrer"></iframe>
+    <div class="im-note">室内图来自 campus-map-site，深链格式 #楼栋/楼层；房间可在对方页面搜索。</div>
+  </div>
+</div>
+
+<div id="loading">
+  <div class="loading-inner"><div class="spinner"></div><div>正在加载学校 GIS 底图…</div></div>
+</div>
+
+<script src="vendor/leaflet/leaflet.js?v=1"></script>
+<script src="data/real-pois.js?v=1"></script>
+<script src="b-package/assets/b-building-data.js?v=2"></script>
+<script src="data/real-road-snap.js?v=1"></script>
+<script src="assets/indoor-providers.js?v=4"></script>
+<script src="app/real-map.js?v=6"></script>
+<script>
+(function () {
+  setTimeout(function () {
+    if (window.__REAL_MAP_READY__ || document.getElementById("bootError")) return;
+    var l = document.getElementById("loading");
+    if (l) {
+      l.style.display = "flex";
+      l.classList.remove("hide");
+      l.innerHTML = '<div class="loading-inner"><div>地图初始化超时</div><div style="font-size:11px;color:#8d9aab">请用 Chrome/Edge 打开，按 F12 查看 Console；底图需要联网</div></div>';
+    }
+  }, 8000);
+})();
+</script>
+</body>
+</html>
+
+

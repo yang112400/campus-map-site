@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>B栋 · 室内路线（2.5D）</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #070a0e; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif; color: #e8edf4; -webkit-font-smoothing: antialiased; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  #ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  .panel { pointer-events: auto; background: rgba(13,18,25,.86); border: 1px solid rgba(255,255,255,.08); border-radius: 13px; backdrop-filter: blur(14px); box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+  header { position: absolute; top: 20px; left: 22px; padding: 15px 19px 13px; }
+  header h1 { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: .3px; }
+  header h1 span { color: #5ab0ff; }
+  header p { margin: 6px 0 0; font-size: 11.5px; color: #8d9aab; }
+  header .tag { display: inline-block; margin-top: 9px; padding: 3px 8px; font-size: 10.5px; color: #9fd0ff; background: rgba(90,176,255,.12); border: 1px solid rgba(90,176,255,.25); border-radius: 999px; }
+  header .head-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+  header .back-link { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; font-size: 11.5px; line-height: 1; color: #9fd0ff; text-decoration: none; background: rgba(90,176,255,.08); border: 1px solid rgba(90,176,255,.35); border-radius: 8px; transition: background .15s ease, border-color .15s ease, color .15s ease; }
+  header .back-link:hover { color: #d6ecff; background: rgba(90,176,255,.18); border-color: rgba(90,176,255,.65); }
+
+  #floorBtns { position: absolute; top: 20px; right: 22px; padding: 8px; display: flex; flex-wrap: wrap; gap: 4px; max-width: 360px; }
+  #floorBtns button { appearance: none; border: 0; background: transparent; color: #a9b6c6; font: inherit; font-size: 12px; padding: 7px 11px; border-radius: 8px; cursor: pointer; }
+  #floorBtns button:hover { background: rgba(255,255,255,.06); color: #e8edf4; }
+  #floorBtns button.active { background: #5ab0ff; color: #06121f; font-weight: 650; }
+
+  #routeBar { position: absolute; left: 22px; bottom: 24px; padding: 10px 12px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; max-width: 640px; }
+  #routeBar .rb-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  #routeBar .rb-label { font-size: 11.5px; color: #7f8da0; flex: none; }
+  #routeBar .arrow { font-size: 13px; color: #5ab0ff; flex: none; }
+  #routeBar select { background: #0f1822; color: #dbe7f5; border: 1px solid #2f4257; border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 12px; min-width: 118px; max-width: 260px; flex: 1 1 150px; }
+  #routeBar #routeSelect { flex: 1 1 200px; max-width: 300px; }
+  #routeBar button { appearance: none; border: 0; background: #1c2c3e; color: #cfe2f5; font: inherit; font-size: 12px; padding: 8px 13px; border-radius: 8px; cursor: pointer; flex: none; }
+  #routeBar button.primary { background: #5ab0ff; color: #06121f; font-weight: 650; }
+  #routeBar button:hover { filter: brightness(1.12); }
+  #routeBar label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #9fb0c4; cursor: pointer; flex: none; }
+  #routeBar input { accent-color: #5ab0ff; }
+
+  #routeCard { position: absolute; right: 22px; bottom: 24px; width: 316px; max-height: min(64vh, 540px); padding: 14px 16px; display: none; flex-direction: column; }
+  #routeCard.show { display: flex; }
+  #routeCard .eyebrow { font-size: 10px; letter-spacing: 1.5px; color: #5ab0ff; font-weight: 700; }
+  #routeCard h2 { margin: 6px 0 3px; font-size: 15px; font-weight: 600; }
+  #routeCard .sub { font-size: 11.5px; color: #8d9aab; line-height: 1.5; }
+  #routeCard .rows { margin-top: 10px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 9px; }
+  #routeCard .row { display: flex; justify-content: space-between; font-size: 11.5px; padding: 3px 0; gap: 12px; }
+  #routeCard .row .k { color: #7f8da0; flex: none; }
+  #routeCard .row .v { font-variant-numeric: tabular-nums; text-align: right; }
+  #routeCard .steps { margin: 10px -2px 0; padding: 9px 2px 0; border-top: 1px solid rgba(255,255,255,.08); list-style: none; overflow-y: auto; max-height: 246px; }
+  #routeCard .steps li { display: flex; gap: 8px; padding: 4px 0; font-size: 11.5px; line-height: 1.5; color: #c6d3e3; }
+  #routeCard .steps .idx { flex: none; width: 16px; height: 16px; margin-top: 1px; border-radius: 50%; font-size: 9.5px; line-height: 14px; text-align: center; font-variant-numeric: tabular-nums; color: #9fd0ff; background: rgba(90,176,255,.16); border: 1px solid rgba(90,176,255,.38); }
+  #routeCard .steps li[data-type="elevator"] .idx, #routeCard .steps li[data-type="stairs"] .idx, #routeCard .steps li[data-type="ramp"] .idx, #routeCard .steps li[data-type="passage"] .idx { color: #c4b5fd; background: rgba(167,139,250,.16); border-color: rgba(167,139,250,.45); }
+  #routeCard .steps li[data-type="entrance"] .idx { color: #ffd166; background: rgba(255,176,32,.14); border-color: rgba(255,176,32,.45); }
+  #routeCard .steps li[data-type="arrive"] { color: #e8edf4; font-weight: 600; }
+  #routeCard .steps li[data-type="arrive"] .idx { color: #ff9db0; background: rgba(255,92,122,.18); border-color: rgba(255,92,122,.5); }
+  #routeCard .steps::-webkit-scrollbar { width: 6px; }
+  #routeCard .steps::-webkit-scrollbar-thumb { background: rgba(90,176,255,.28); border-radius: 3px; }
+
+  #legend { position: absolute; right: 22px; top: 120px; padding: 11px 13px; display: flex; flex-direction: column; gap: 6px; }
+  #legend .li { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #a9b6c6; }
+  #legend .sw { width: 16px; height: 3px; border-radius: 2px; }
+  #legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  #hint { position: absolute; left: 24px; bottom: 142px; font-size: 11.5px; color: #647286; line-height: 1.7; }
+  #hint b { color: #9aa9bc; font-weight: 500; }
+
+  #error { position: absolute; left: 50%; top: 100px; transform: translateX(-50%); z-index: 20; background: #3a1010; border: 1px solid #c04040; color: #f08080; padding: 9px 16px; border-radius: 7px; font-size: 12.5px; display: none; max-width: 520px; text-align: center; }
+
+  @media (max-width: 900px) { #legend { display: none; } #routeCard { display: none !important; } header p { display: none; } #hint { display: none; } #routeBar { max-width: calc(100vw - 44px); } }
+  @media (max-height: 640px) { #routeCard .steps { max-height: 150px; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="ui">
+  <header class="panel">
+    <div class="head-top">
+      <h1>B栋 <span>·</span> 室内路线</h1>
+      <a class="back-link" href="../real-map.html" title="返回室外地图">← 返回室外</a>
+    </div>
+    <p>南楼 7 层 + 北楼 4/5 层 · 8 个入口 · 80 间教室</p>
+    <div class="tag">B_BUILDING_DATA · 2.5D</div>
+  </header>
+
+  <div id="floorBtns" class="panel"></div>
+
+  <div id="routeBar" class="panel">
+    <div class="rb-row">
+      <span class="rb-label">起点</span>
+      <select id="startSelect" aria-label="起点（入口或教室）"></select>
+      <span class="arrow">→</span>
+      <span class="rb-label">终点</span>
+      <select id="endSelect" aria-label="终点（入口或教室）"></select>
+      <button id="btnPlan" class="primary" type="button">规划路线</button>
+    </div>
+    <div class="rb-row">
+      <select id="routeSelect" aria-label="示例路线"></select>
+      <button id="btnShow" type="button">显示示例</button>
+      <button id="btnReset" type="button">重置视角</button>
+      <label><input type="checkbox" id="tgLabels" checked /> 房间标签</label>
+    </div>
+  </div>
+
+  <div id="routeCard" class="panel">
+    <div class="eyebrow">INDOOR ROUTE</div>
+    <h2 id="rcName">—</h2>
+    <div class="sub" id="rcSub">—</div>
+    <div class="rows">
+      <div class="row"><span class="k">耗时</span><span class="v" id="rcTime">—</span></div>
+      <div class="row"><span class="k">距离</span><span class="v" id="rcDistance">—</span></div>
+      <div class="row"><span class="k">楼层</span><span class="v" id="rcFloors">—</span></div>
+      <div class="row"><span class="k">节点数</span><span class="v" id="rcNodes">—</span></div>
+      <div class="row"><span class="k">数据来源</span><span class="v">B_BUILDING_DATA</span></div>
+    </div>
+    <ol class="steps" id="rcSteps"></ol>
+  </div>
+
+  <div id="legend" class="panel">
+    <div class="li"><span class="sw" style="background:#5ab0ff"></span>室内路线</div>
+    <div class="li"><span class="sw" style="background:#a78bfa"></span>楼梯 / 电梯</div>
+    <div class="li"><span class="sw" style="background:#ffb020"></span>入口</div>
+    <div class="li"><span class="dot" style="background:#3ddc84"></span>起点</div>
+    <div class="li"><span class="dot" style="background:#ff5c7a"></span>终点</div>
+  </div>
+
+  <div id="hint"><b>左键</b> 旋转 · <b>滚轮</b> 缩放 · <b>右键</b> 平移 · 选入口/教室后点“规划路线”</div>
+  <div id="error"></div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="assets/b-building-data.js"></script>
+<script src="assets/b-indoor-nav.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var D = window.B_BUILDING_DATA;
+  var errEl = document.getElementById("error");
+  if (!D) { errEl.textContent = "B_BUILDING_DATA 未加载：请确认 assets/b-building-data.js 与 3d.html 同级；如果只拿到一个 3d.html，请改用 3d-standalone.html"; errEl.style.display = "block"; return; }
+  var Nav = window.BIndoorNav;
+  if (!Nav) { errEl.textContent = "BIndoorNav 未加载：请确认 assets/b-indoor-nav.js 与 3d.html 同级"; errEl.style.display = "block"; return; }
+  var graph = Nav.buildGraph(D);
+
+  var SOUTH = { x0: 0, x1: 270, z0: -20, z1: 20 };
+  var NORTH = { x0: 60, x1: 130.4, z0: -59.5, z1: -40.5 };
+  var floorById = {}, roomById = {}, nodeById = {};
+  D.floors.forEach(function (f) { floorById[f.id] = f; });
+  D.rooms.forEach(function (r) { roomById[r.id] = r; });
+  D.nodes.forEach(function (n) { nodeById[n.id] = n; });
+
+  var container = document.getElementById("app");
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x070a0e);
+  scene.fog = new THREE.Fog(0x070a0e, 900, 2200);
+
+  var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 4000);
+  var CAM0 = new THREE.Vector3(255, 240, 360);
+  var TARGET0 = new THREE.Vector3(135, 22, 0);
+  camera.position.copy(CAM0);
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  if ("outputEncoding" in renderer) renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  container.appendChild(renderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.copy(TARGET0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 40;
+  controls.maxDistance = 1800;
+  controls.maxPolarAngle = Math.PI * 0.49;
+  controls.update();
+
+  scene.add(new THREE.HemisphereLight(0x9ecbff, 0x0a0e13, 1.0));
+  var sun = new THREE.DirectionalLight(0xffffff, 1.2);
+  sun.position.set(300, 500, 200);
+  scene.add(sun);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+  function makeLabel(text, color, bg, height) {
+    var fs = 48;
+    var cv = document.createElement("canvas");
+    var ctx = cv.getContext("2d");
+    ctx.font = "600 " + fs + "px 'Microsoft YaHei','PingFang SC',sans-serif";
+    var tw = ctx.measureText(text).width;
+    cv.width = Math.ceil(tw + 36);
+    cv.height = fs + 28;
+    ctx = cv.getContext("2d");
+    ctx.font = "600 " + fs + "px 'Microsoft YaHei','PingFang SC',sans-serif";
+    ctx.fillStyle = bg || "rgba(8,12,17,.82)";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.strokeStyle = "rgba(90,176,255,.25)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, cv.width - 2, cv.height - 2);
+    ctx.fillStyle = color || "#dbe7f5";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, cv.width / 2, cv.height / 2 + 2);
+    var tex = new THREE.CanvasTexture(cv);
+    tex.minFilter = THREE.LinearFilter;
+    var mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false });
+    var sp = new THREE.Sprite(mat);
+    var h = height || 6;
+    sp.scale.set(h * cv.width / cv.height, h, 1);
+    return sp;
+  }
+
+  var floorGroups = {};
+  var allLabels = [];
+  var labelsOn = true;
+
+  function slab(parent, w, d, x, y, z, color, opacity) {
+    var geo = new THREE.BoxGeometry(w, 0.6, d);
+    var mat = new THREE.MeshStandardMaterial({ color: color, roughness: .85, metalness: .05, transparent: true, opacity: opacity });
+    var mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    parent.add(mesh);
+    var edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0x3f6285, transparent: true, opacity: .8 }));
+    edges.position.copy(mesh.position);
+    parent.add(edges);
+    mesh.userData.edges = edges;
+    return mesh;
+  }
+
+  D.floors.forEach(function (fl) {
+    var g = new THREE.Group();
+    g.userData.floorId = fl.id;
+    // 整层倾斜：楼板、教室、走廊、楼梯、电梯、入口一起绕 Z 轴旋转
+    if (fl.slabTiltDeg) g.rotation.z = THREE.MathUtils.degToRad(fl.slabTiltDeg);
+    scene.add(g);
+    floorGroups[fl.id] = { group: g, roomSprites: [] };
+
+    var isN = fl.wing === "N";
+    var w = isN ? (NORTH.x1 - NORTH.x0) : (SOUTH.x1 - SOUTH.x0);
+    var d = isN ? (NORTH.z1 - NORTH.z0) : (SOUTH.z1 - SOUTH.z0);
+    var cx = isN ? (NORTH.x0 + NORTH.x1) / 2 : (SOUTH.x0 + SOUTH.x1) / 2;
+    var cz = isN ? (NORTH.z0 + NORTH.z1) / 2 : 0;
+    var slabMesh = slab(g, w, d, cx, fl.displayY, cz, 0x0d2040, 0.84);
+    slabMesh.userData.floorId = fl.id;
+
+    // 走廊（中间；按该层实际走廊节点范围画，不强行画满 270m）
+    var corrNodes = D.nodes.filter(function (n) { return n.floor === fl.id && n.type === "corridor"; });
+    if (corrNodes.length) {
+      var xs = corrNodes.map(function (n) { return n.x; });
+      var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+      var corrLen = Math.max(4, maxX - minX);
+      var corrX = (minX + maxX) / 2;
+      var corridor = new THREE.Mesh(
+        new THREE.BoxGeometry(corrLen, 0.12, 4),
+        new THREE.MeshStandardMaterial({ color: 0x1b3a5a, roughness: .8, metalness: .05, transparent: true, opacity: .95 })
+      );
+      corridor.position.set(corrX, fl.displayY + 0.14, isN ? -50 : 0);
+      g.add(corridor);
+    }
+
+    // 北侧服务带（南楼；按该层服务节点范围画，不强行画满 270m）
+    if (!isN) {
+      var svcNodes = D.nodes.filter(function (n) {
+        return n.floor === fl.id && (n.type === "stair" || n.type === "elevator" || n.type === "stair_core" || n.type === "void");
+      });
+      if (svcNodes.length) {
+        var sxs = svcNodes.map(function (n) { return n.x; });
+        var sMin = Math.min.apply(null, sxs), sMax = Math.max.apply(null, sxs);
+        var bandLen = Math.max(6, sMax - sMin + 8);
+        var band = new THREE.Mesh(
+          new THREE.BoxGeometry(bandLen, 0.08, 8),
+          new THREE.MeshStandardMaterial({ color: 0x141a22, roughness: .95, transparent: true, opacity: .55 })
+        );
+        band.position.set((sMin + sMax) / 2, fl.displayY + 0.10, -8);
+        g.add(band);
+      }
+    }
+
+    var flLabel = makeLabel(fl.id + " · " + (isN ? "北楼" : fl.level + "层"), "#5ab0ff", "rgba(9,22,44,.9)", 9);
+    flLabel.position.set(isN ? 140 : 288, fl.displayY + 2.0, isN ? -50 : 0);
+    g.add(flLabel);
+    allLabels.push(flLabel);
+
+    fl.rooms.forEach(function (r) {
+      var box = new THREE.Mesh(
+        new THREE.BoxGeometry(7, 0.35, 7),
+        new THREE.MeshStandardMaterial({ color: 0x1f6fd0, roughness: .6, metalness: .1, transparent: true, opacity: .95 })
+      );
+      box.position.set(r.x, fl.displayY + 0.8, r.z);
+      g.add(box);
+
+      var sp = makeLabel(r.id, "#dbe7f5", "rgba(9,22,44,.82)", 5.2);
+      sp.position.set(r.x, fl.displayY + 5.0, r.z);
+      sp.userData.floorId = fl.id;
+      g.add(sp);
+      floorGroups[fl.id].roomSprites.push(sp);
+      allLabels.push(sp);
+    });
+
+    D.stairs.forEach(function (s) {
+      if (s.floor !== fl.id) return;
+      var m = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.5, 1.5, 2.4, 10),
+        new THREE.MeshStandardMaterial({ color: 0x3ddc84, roughness: .7 })
+      );
+      m.position.set(s.x, fl.displayY + 1.6, s.z);
+      g.add(m);
+    });
+
+    // 原始图的楼梯柱 core（固定 x 的竖向连接）
+    (D.cores || []).forEach(function (c) {
+      if (c.floor !== fl.id) return;
+      var m = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.9, 0.9, 2.2, 8),
+        new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: .7 })
+      );
+      m.position.set(c.x, fl.displayY + 1.4, c.z);
+      g.add(m);
+    });
+
+    D.elevators.forEach(function (e) {
+      if (e.floor !== fl.id) return;
+      var m = new THREE.Mesh(
+        new THREE.BoxGeometry(3, 3, 3),
+        new THREE.MeshStandardMaterial({ color: 0x5a6ade, roughness: .6 })
+      );
+      m.position.set(e.x, fl.displayY + 2.0, e.z);
+      g.add(m);
+    });
+
+    D.entrances.forEach(function (en) {
+      if (en.floor !== fl.id) return;
+      var cone = new THREE.Mesh(
+        new THREE.ConeGeometry(2.4, 5.5, 4),
+        new THREE.MeshStandardMaterial({ color: 0xffb020, roughness: .7 })
+      );
+      cone.position.set(en.x, fl.displayY + 3.4, en.z);
+      g.add(cone);
+      var sp = makeLabel(en.name, "#ffd166", "rgba(40,26,8,.88)", 4.6);
+      sp.position.set(en.x, fl.displayY + 8.0, en.z);
+      g.add(sp);
+      allLabels.push(sp);
+    });
+  });
+
+  var routeGroup = new THREE.Group();
+  scene.add(routeGroup);
+
+  function clearRoute() {
+    while (routeGroup.children.length) {
+      var c = routeGroup.children.pop();
+      if (c.geometry) c.geometry.dispose();
+      if (c.material) {
+        if (c.material.map) c.material.map.dispose();
+        c.material.dispose();
+      }
+    }
+  }
+
+  function tiltXY(x, y, fl) {
+    if (fl && fl.wing === "S" && fl.slabTiltDeg) {
+      var r = THREE.MathUtils.degToRad(fl.slabTiltDeg);
+      return { x: x * Math.cos(r) - y * Math.sin(r), y: x * Math.sin(r) + y * Math.cos(r) };
+    }
+    return { x: x, y: y };
+  }
+
+  function posOf(n) {
+    var fl = floorById[n.floor];
+    var y = fl ? fl.displayY + 1.6 : 1.6;
+    var p = tiltXY(n.x, y, fl);
+    return new THREE.Vector3(p.x, p.y, n.z);
+  }
+
+  function addSegment(p1, p2, color) {
+    var dir = new THREE.Vector3().subVectors(p2, p1);
+    var len = dir.length();
+    if (len < 0.2) return;
+    var geo = new THREE.CylinderGeometry(2.0, 2.0, len, 10);
+    var mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 1 }));
+    mesh.position.copy(p1).add(p2).multiplyScalar(0.5);
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+    routeGroup.add(mesh);
+  }
+
+  function addMarker(p, color, text) {
+    var m = new THREE.Mesh(new THREE.SphereGeometry(3.2, 16, 12), new THREE.MeshBasicMaterial({ color: color }));
+    m.position.copy(p);
+    routeGroup.add(m);
+    var sp = makeLabel(text, "#ffffff", "rgba(8,12,17,.9)", 5.5);
+    sp.position.copy(p).add(new THREE.Vector3(0, 8, 0));
+    routeGroup.add(sp);
+  }
+
+  function showRoute(ids, opts) {
+    clearRoute();
+    if (!ids || ids.length < 2) { showError("路线节点不足"); return; }
+    var pts = [];
+    for (var i = 0; i < ids.length; i++) {
+      var n = nodeById[ids[i]];
+      if (!n) { showError("节点不存在：" + ids[i]); return; }
+      pts.push(posOf(n));
+    }
+    for (var j = 0; j < pts.length - 1; j++) {
+      var a = nodeById[ids[j]], b = nodeById[ids[j + 1]];
+      var color = 0x35c8ff;
+      if (a.floor !== b.floor) color = 0xc4b5fd;
+      if (a.type === "entrance" || b.type === "entrance") color = 0xffc247;
+      addSegment(pts[j], pts[j + 1], color);
+    }
+    addMarker(pts[0], 0x3ddc84, "起点");
+    addMarker(pts[pts.length - 1], 0xff5c7a, "终点");
+    setFloor(null, true);
+    updateRouteCard(ids, opts && opts.name);
+  }
+
+  function updateRouteCard(ids, name) {
+    var card = document.getElementById("routeCard");
+    card.classList.add("show");
+
+    var stats = Nav.pathStats(D, ids);
+    var steps = Nav.buildSteps(D, ids);
+    var startNode = nodeById[ids[0]] || {};
+    var endNode = nodeById[ids[ids.length - 1]] || {};
+
+    var title = name;
+    if (!title) title = (startNode.name || ids[0]) + " → " + (endNode.name || ids[ids.length - 1]);
+    document.getElementById("rcName").textContent = title;
+    document.getElementById("rcSub").textContent =
+      "起点 " + (startNode.name || ids[0]) + "（" + (startNode.floor || "—") + "） · 终点 " +
+      (endNode.name || ids[ids.length - 1]) + "（" + (endNode.floor || "—") + "）";
+    document.getElementById("rcTime").textContent = stats.time ? Math.round(stats.time) + " s" : "—";
+    document.getElementById("rcDistance").textContent = stats.distance ? Math.round(stats.distance) + " m" : "—";
+    var floorSpan = stats.fromFloor && stats.toFloor && stats.fromFloor !== stats.toFloor
+      ? stats.fromFloor + " → " + stats.toFloor
+      : (stats.fromFloor || "—");
+    document.getElementById("rcFloors").textContent = floorSpan;
+    document.getElementById("rcNodes").textContent = stats.nodeCount;
+
+    var ol = document.getElementById("rcSteps");
+    ol.innerHTML = "";
+    steps.forEach(function (s, i) {
+      var li = document.createElement("li");
+      li.setAttribute("data-type", s.type || "corridor");
+      var idx = document.createElement("span");
+      idx.className = "idx";
+      idx.textContent = String(i + 1);
+      var txt = document.createElement("span");
+      txt.className = "txt";
+      txt.textContent = s.text || String(s);
+      li.appendChild(idx);
+      li.appendChild(txt);
+      ol.appendChild(li);
+    });
+    card.scrollTop = 0;
+
+    window.__lastRoute = { path: ids.slice(), stats: stats, steps: steps };
+  }
+
+  function showError(msg) {
+    errEl.textContent = msg;
+    errEl.style.display = "block";
+    setTimeout(function () { errEl.style.display = "none"; }, 3000);
+  }
+
+  var activeFloor = null;
+  function setFloor(fid, keepRoute) {
+    activeFloor = fid;
+    document.querySelectorAll("#floorBtns button").forEach(function (b) {
+      b.classList.toggle("active", (b.getAttribute("data-floor") || "") === (fid || ""));
+    });
+    D.floors.forEach(function (fl) {
+      var g = floorGroups[fl.id];
+      var dim = !!fid && fid !== fl.id;
+      g.group.traverse(function (o) {
+        if (!o.material) return;
+        var m = o.material;
+        if (m.userData.baseOpacity == null) {
+          m.userData.baseOpacity = m.opacity == null ? 1 : m.opacity;
+          m.userData.baseTransparent = !!m.transparent;
+        }
+        if (dim) { m.transparent = true; m.opacity = Math.min(0.18, m.userData.baseOpacity); }
+        else { m.transparent = m.userData.baseTransparent; m.opacity = m.userData.baseOpacity; }
+      });
+      g.roomSprites.forEach(function (sp) {
+        sp.visible = labelsOn && !!fid && fid === fl.id;
+      });
+    });
+    allLabels.forEach(function (sp) {
+      if (sp.userData.floorId == null) { sp.visible = labelsOn; return; }
+      sp.visible = labelsOn && !!fid && sp.userData.floorId === fid;
+    });
+  }
+
+  var fb = document.getElementById("floorBtns");
+  function addFloorBtn(label, fid) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = label;
+    b.setAttribute("data-floor", fid || "");
+    b.addEventListener("click", function () { setFloor(fid, false); });
+    fb.appendChild(b);
+  }
+  addFloorBtn("全部", null);
+  D.floors.forEach(function (fl) { addFloorBtn(fl.id, fl.id); });
+
+  /* ---------------- 示例路线 ---------------- */
+  var sel = document.getElementById("routeSelect");
+  D.routes.forEach(function (r, i) {
+    var o = document.createElement("option");
+    o.value = String(i);
+    o.textContent = r.name + " · " + r.time + "s";
+    sel.appendChild(o);
+  });
+
+  /* ---------------- 起终点下拉：8 个入口 + 80 间教室，按楼层分组 ---------------- */
+  var startSel = document.getElementById("startSelect");
+  var endSel = document.getElementById("endSelect");
+
+  function fillEndpointSelect(select) {
+    D.floors.forEach(function (fl) {
+      var og = document.createElement("optgroup");
+      og.label = fl.name || fl.id;
+      D.entrances.forEach(function (en) {
+        if (en.floor !== fl.id) return;
+        var o = document.createElement("option");
+        o.value = en.id;
+        o.textContent = "入口 · " + en.name;
+        og.appendChild(o);
+      });
+      fl.rooms.forEach(function (r) {
+        var o = document.createElement("option");
+        o.value = r.node;
+        o.textContent = r.name;
+        og.appendChild(o);
+      });
+      if (og.children.length) select.appendChild(og);
+    });
+  }
+  fillEndpointSelect(startSel);
+  fillEndpointSelect(endSel);
+
+  function hasOption(select, value) {
+    for (var i = 0; i < select.options.length; i++) {
+      if (select.options[i].value === value) return true;
+    }
+    return false;
+  }
+
+  function setSelect(select, value) {
+    var nid = Nav.resolveNode(D, value);
+    if (!nid || !hasOption(select, nid)) return false;
+    select.value = nid;
+    return true;
+  }
+
+  function floorOfNode(id) {
+    var n = nodeById[id];
+    return n && n.floor ? n.floor : "";
+  }
+
+  function syncUrl(fromId, toId, floorId) {
+    var search = "?from=" + encodeURIComponent(fromId) + "&to=" + encodeURIComponent(toId) +
+      (floorId ? "&floor=" + encodeURIComponent(floorId) : "");
+    try {
+      window.history.replaceState(null, "", window.location.pathname + search + window.location.hash);
+    } catch (err) {
+      /* file:// 下浏览器可能禁止 replaceState，退化为 hash 分享 */
+      window.location.hash = search.slice(1);
+    }
+  }
+
+  function planRoute(opts) {
+    opts = opts || {};
+    var from = Nav.resolveNode(D, opts.from || startSel.value);
+    var to = Nav.resolveNode(D, opts.to || endSel.value);
+    if (!from) { showError("请先选择起点"); return null; }
+    if (!to) { showError("请先选择终点"); return null; }
+    if (from === to) { showError("起点和终点相同"); return null; }
+    var path = Nav.dijkstra(D, from, to);
+    if (!path) { showError("两点之间没有可达路线"); return null; }
+    showRoute(path, opts.name ? { name: opts.name } : null);
+    if (opts.sync !== false) syncUrl(from, to, floorOfNode(to));
+    return path;
+  }
+
+  document.getElementById("btnPlan").addEventListener("click", function () {
+    planRoute();
+  });
+  document.getElementById("btnShow").addEventListener("click", function () {
+    var r = D.routes[Number(sel.value) || 0];
+    if (!r) return;
+    var path = Nav.dijkstra(D, r.from, r.to);
+    if (!path) { showError("示例路线节点缺失"); return; }
+    setSelect(startSel, r.from);
+    setSelect(endSel, r.to);
+    showRoute(path, { name: r.name });
+    syncUrl(r.from, r.to, floorOfNode(r.to));
+  });
+  document.getElementById("btnReset").addEventListener("click", function () {
+    camera.position.copy(CAM0);
+    controls.target.copy(TARGET0);
+    controls.update();
+  });
+  document.getElementById("tgLabels").addEventListener("change", function (e) {
+    labelsOn = e.target.checked;
+    setFloor(activeFloor, true);
+  });
+
+  /* 兼容旧接入 API：__B_MODEL__.dijkstra(start, goal) / resolveNode(id) */
+  function dijkstra(start, goal) { return Nav.dijkstra(D, start, goal); }
+  function resolveNode(x) { return Nav.resolveNode(D, x); }
+
+  /* ---------------- 初始状态：?route= 兼容 → ?from=&to=&floor= → 默认第一条示例 ---------------- */
+  var params = new URLSearchParams(window.location.search);
+  var routeParam = params.get("route");
+  var fromParam = resolveNode(params.get("from"));
+  var toParam = resolveNode(params.get("to"));
+  var floorParam = params.get("floor");
+  var fallbackRoute = D.routes[0];
+
+  function showFallbackRoute() {
+    setSelect(startSel, fallbackRoute.from);
+    setSelect(endSel, fallbackRoute.to);
+    showRoute(fallbackRoute.path, { name: fallbackRoute.name });
+  }
+
+  if (routeParam) {
+    var routeIds = routeParam.split(",").map(function (s) { return s.trim(); }).filter(function (s) {
+      return !!s && !!nodeById[s];
+    });
+    if (routeIds.length >= 2) {
+      showRoute(routeIds);
+      setSelect(startSel, routeIds[0]);
+      setSelect(endSel, routeIds[routeIds.length - 1]);
+    } else {
+      showError("?route= 参数无效，已显示示例路线");
+      showFallbackRoute();
+    }
+  } else if (fromParam && toParam) {
+    var initPath = Nav.dijkstra(D, fromParam, toParam);
+    if (initPath) {
+      setSelect(startSel, fromParam);
+      setSelect(endSel, toParam);
+      showRoute(initPath);
+    } else {
+      showError("URL 中的起终点不可达，已显示示例路线");
+      showFallbackRoute();
+    }
+  } else {
+    showFallbackRoute();
+  }
+
+  if (floorParam && floorById[floorParam]) {
+    setFloor(floorParam, true);
+  } else if (floorParam) {
+    showError("未知楼层参数：" + floorParam);
+  }
+
+  var clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    clock.getDelta();
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener("resize", function () {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  window.__B_MODEL__ = { data: D, graph: graph, nav: Nav, showRoute: showRoute, setFloor: setFloor, dijkstra: dijkstra, resolveNode: resolveNode, planRoute: planRoute };
+})();
+</script>
+</body>
+</html>

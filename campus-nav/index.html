@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>校园导航 · 模拟室外</title>
+<link rel="stylesheet" href="styles/outdoor.css?v=3" />
+</head>
+<body>
+<div id="app"></div>
+
+<div id="ui">
+  <header class="panel" id="brand">
+    <h1>校园导航 <span>·</span> 模拟室外</h1>
+    <p>点选起点与终点 · 3D 路线 · 米制坐标</p>
+    <div class="tag">course demo · 5 m accuracy</div>
+    <div class="tag subtle">室内图：A/C/E-1/E-2/E-3/F/G/I · B 栋不接入</div>
+    <a class="tag" href="real-map.html" style="text-decoration:none">真实 GIS 地图 →</a>
+    <a class="tag" href="cycling.html" style="text-decoration:none;color:#ffd58a;border-color:rgba(245,166,35,.45);background:rgba(245,166,35,.12)">乐骑骑行 →</a>
+  </header>
+
+  <section class="panel" id="endpointPanel">
+    <div class="ep-card" id="startCard">
+      <div class="ep-head">
+        <span class="dot start"></span>
+        <span class="role">起点</span>
+      </div>
+      <div class="ep-name" id="startName">点击地图选择</div>
+      <div class="ep-sub" id="startSub">—</div>
+      <select id="startSelect" aria-label="选择起点"></select>
+    </div>
+
+    <div class="ep-card" id="endCard">
+      <div class="ep-head">
+        <span class="dot end"></span>
+        <span class="role">终点</span>
+      </div>
+      <div class="ep-name" id="endName">点击地图选择</div>
+      <div class="ep-sub" id="endSub">—</div>
+      <select id="endSelect" aria-label="选择终点"></select>
+    </div>
+
+    <div class="ep-actions">
+      <button id="btnSwap" type="button">交换起终点</button>
+      <button id="btnReset" type="button">清除重选</button>
+    </div>
+  </section>
+
+  <section class="panel" id="routeCard">
+    <div class="rc-top">
+      <div class="rc-stat">
+        <div class="k">总距离</div>
+        <div class="v" id="routeDist">—</div>
+      </div>
+      <div class="rc-stat">
+        <div class="k">步行约</div>
+        <div class="v" id="routeTime">—</div>
+      </div>
+      <div class="rc-stat">
+        <div class="k">路线</div>
+        <div class="v" id="routeKind">室外</div>
+      </div>
+    </div>
+    <div id="steps" class="steps"></div>
+  </section>
+
+  <div class="panel" id="indoorBar">
+    <div class="ib-text">
+      <b id="indoorTitle">A栋</b>
+      <span id="indoorSub">室内图 · 外部页面</span>
+    </div>
+    <select id="indoorFloor" aria-label="选择楼层"></select>
+    <button id="btnIndoor" type="button">打开室内图</button>
+    <a id="indoorNew" href="#" target="_blank" rel="noopener">新窗口</a>
+  </div>
+
+  <nav class="panel" id="viewBar">
+    <button data-view="iso" class="active" type="button">斜视</button>
+    <button data-view="top" type="button">俯视</button>
+    <button id="btnNet" type="button">路网</button>
+    <button id="btnGrid" type="button">网格</button>
+  </nav>
+
+  <div id="coord">X — m · Z — m</div>
+  <div id="hint">左键旋转 · 滚轮缩放 · 右键平移 · 点击道路或建筑选点</div>
+  <div id="toast"></div>
+</div>
+
+<div id="indoorModal" aria-hidden="true">
+  <div class="im-card">
+    <div class="im-head">
+      <div class="im-title">
+        <b id="imTitle">A栋 · 室内图</b>
+        <span id="imSub">campus-map-site · 需要联网</span>
+      </div>
+      <div class="im-actions">
+        <select id="imFloor" aria-label="切换楼层"></select>
+        <a id="imNew" href="#" target="_blank" rel="noopener">新窗口打开</a>
+        <button id="imClose" type="button">关闭</button>
+      </div>
+    </div>
+    <iframe id="imFrame" title="室内导航图" referrerpolicy="no-referrer"></iframe>
+    <div class="im-note">室内图来自外部站点，深链格式 #楼栋/楼层；楼层内可用页面搜索框查找房间。</div>
+  </div>
+</div>
+
+<div id="loading">
+  <div class="loading-inner">
+    <div class="spinner"></div>
+    <div>正在构建校园场景…</div>
+  </div>
+</div>
+
+<script src="vendor/three.min.js?v=3"></script>
+<script src="vendor/OrbitControls.js?v=3"></script>
+<script src="data/campus.js?v=3"></script>
+<script src="assets/indoor-providers.js?v=4"></script>
+<script src="app/scene.js?v=3"></script>
+<script src="app/nav.js?v=3"></script>
+<script src="app/indoor-bridge.js?v=3"></script>
+<script src="app/main.js?v=3"></script>
+<script>
+(function () {
+  window.addEventListener("error", function (e) {
+    var el = document.getElementById("bootError");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "bootError";
+      el.style.cssText = "position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:999;max-width:80vw;padding:12px 16px;border-radius:10px;background:rgba(60,10,20,.95);border:1px solid #ff6b6b;color:#fff;font:12px/1.6 sans-serif;white-space:pre-wrap;";
+      document.body.appendChild(el);
+    }
+    el.textContent = "页面脚本错误：" + (e.message || e.error || "未知错误") + "\n请按 F12 打开 Console 查看详情。";
+  });
+  setTimeout(function () {
+    if (!window.__NAV_READY__ && !window.__NAV_FAILED__) {
+      var l = document.getElementById("loading");
+      if (l) {
+        l.style.display = "flex";
+        l.classList.remove("hide");
+        l.innerHTML = '<div class="loading-inner"><div>页面初始化超时</div><div style="font-size:11px;color:#8d9aab">请用 Chrome/Edge 双击打开；若在编辑器预览中打开，请改用浏览器</div></div>';
+      }
+    }
+  }, 8000);
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
