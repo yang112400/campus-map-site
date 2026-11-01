@@ -5511,6 +5511,45 @@
           "rooms": []
         }
       ]
+    },
+    {
+      "id": "I",
+      "name": "信远1区",
+      "alias": "I区",
+      "floors": [
+        {
+          "id": "1F",
+          "name": "1层",
+          "image": "assets/floors/I/1F.jpg?v=20261104i",
+          "width": 1872,
+          "height": 1012,
+          "rooms": []
+        },
+        {
+          "id": "2F",
+          "name": "2层",
+          "image": "assets/floors/I/2F.jpg?v=20261104i",
+          "width": 1809,
+          "height": 958,
+          "rooms": []
+        },
+        {
+          "id": "3F",
+          "name": "3层",
+          "image": "assets/floors/I/3F.jpg?v=20261104i",
+          "width": 1999,
+          "height": 1041,
+          "rooms": []
+        },
+        {
+          "id": "4F",
+          "name": "4层",
+          "image": "assets/floors/I/4F.jpg?v=20261104i",
+          "width": 1972,
+          "height": 988,
+          "rooms": []
+        }
+      ]
     }
   ],
   "legend": [
