@@ -10,7 +10,7 @@
         {
           "id": "1F",
           "name": "1层",
-          "image": "assets/floors/A/1F.jpg",
+          "image": "assets/floors/A/1F.jpg?v=20261108stairs2",
           "width": 1760,
           "height": 686,
           "rooms": [
@@ -72,6 +72,26 @@
                 0.85423,
                 0.07386,
                 0.10933
+              ]
+            },
+            {
+              "name": "楼梯1",
+              "type": "stairs",
+              "rect": [
+                0.56023,
+                0.51312,
+                0.02841,
+                0.07289
+              ]
+            },
+            {
+              "name": "楼梯2",
+              "type": "stairs",
+              "rect": [
+                0.875,
+                0.68513,
+                0.02955,
+                0.0758
               ]
             }
           ]
