@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B栋室内导航 · 西二楼</title>
+  <link rel="stylesheet" href="assets/leaflet/leaflet.css">
+  <link rel="stylesheet" href="style.css?v=20261101redgates2">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">B</div>
+      <div class="brand-text">
+        <h1>B栋室内导航</h1>
+        <p>西二楼 · 1F–7F · 教室与楼梯热点</p>
+      </div>
+    </div>
+    <div class="top-stats">
+      <span><b id="statFloors">7</b> 层</span>
+      <span><b id="statClassrooms">88</b> 间教室</span>
+      <span><b id="statStairs">113</b> 处楼梯</span>
+    </div>
+    <div class="top-actions">
+      <a id="backToMap" class="ghost-btn nav-link" href="../index.html" hidden>← 返回地图</a>
+      <button id="fitBtn" class="ghost-btn" type="button">适应屏幕</button>
+      <button id="allHotspotsBtn" class="ghost-btn active" type="button" aria-pressed="true">全部热点</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel route-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Route planner</span>
+            <h2>起点 → 终点</h2>
+          </div>
+          <button id="swapBtn" class="icon-btn" type="button" title="交换起点和终点" aria-label="交换起点和终点">⇅</button>
+        </div>
+
+        <div class="endpoint start">
+          <span class="endpoint-dot"></span>
+          <div class="endpoint-body">
+            <label for="startSelect">起点</label>
+            <select id="startSelect"></select>
+          </div>
+        </div>
+
+        <div class="endpoint end">
+          <span class="endpoint-dot"></span>
+          <div class="endpoint-body">
+            <label for="endSelect">终点 · 仅教室</label>
+            <select id="endSelect"></select>
+          </div>
+        </div>
+
+        <div class="route-actions">
+          <button id="planBtn" class="primary-btn" type="button">规划路线</button>
+          <button id="clearBtn" class="secondary-btn" type="button">清除</button>
+        </div>
+        <p id="routeMessage" class="route-message">选择起点和终点后，点击「规划路线」。</p>
+      </section>
+
+      <section id="summaryPanel" class="panel summary-panel" hidden>
+        <div class="panel-head summary-head">
+          <div>
+            <span class="eyebrow">Route summary</span>
+            <h2 id="summaryTitle">101 → 538</h2>
+          </div>
+          <span id="summaryBadge" class="badge">跨层</span>
+        </div>
+        <div class="stats">
+          <div><strong id="statDistance">76</strong><span>米</span></div>
+          <div><strong id="statTime">2</strong><span>分钟</span></div>
+          <div><strong id="statFloorsUsed">4</strong><span id="statFloorsLabel">层差</span></div>
+        </div>
+        <div id="summaryMeta" class="summary-meta">经 南楼梯7 · 1层 → 5层</div>
+        <div id="floorPath" class="floor-path"></div>
+      </section>
+
+      <section id="stepsPanel" class="panel steps-panel" hidden>
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Turn by turn</span>
+            <h2>行进路线</h2>
+          </div>
+          <span id="stepCount" class="section-note"></span>
+        </div>
+        <div id="stepsList" class="steps-list"></div>
+      </section>
+
+      <section class="panel search-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Classroom finder</span>
+            <h2>查找教室</h2>
+          </div>
+          <span class="section-note">设为终点</span>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.8-3.8"></path></svg>
+          <input id="searchInput" type="search" placeholder="输入教室号，如 538" autocomplete="off">
+        </div>
+        <div id="searchResults" class="search-results" hidden></div>
+      </section>
+
+      <section class="panel rooms-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">This floor</span>
+            <h2>本层教室</h2>
+          </div>
+          <span id="roomCount" class="section-note"></span>
+        </div>
+        <div id="roomChips" class="room-chips"></div>
+      </section>
+
+      <section class="panel legend-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Legend</span>
+            <h2>图例</h2>
+          </div>
+        </div>
+        <div id="legend" class="legend"></div>
+        <p class="footnote">
+          终点只使用教室热点；跨层路线通过同名楼梯热点连接。楼层图为导览牌示意图，距离与时间为估算值。
+        </p>
+      </section>
+    </aside>
+
+    <section class="viewer-wrap">
+      <div id="viewer"></div>
+
+      <div class="viewer-top">
+        <div id="floorBadge" class="floor-badge">B栋 · 五层</div>
+        <div id="routeBadge" class="route-badge" hidden>导航中</div>
+      </div>
+
+      <div class="viewer-tools">
+        <button id="fitBtnMap" class="map-tool" type="button" title="适应屏幕" aria-label="适应屏幕">⤢</button>
+        <button id="hotspotBtn" class="map-tool active" type="button" title="显示或隐藏热点" aria-label="显示或隐藏热点">◉</button>
+      </div>
+
+      <div id="floorRail" class="floor-rail" aria-label="楼层选择"></div>
+
+      <div id="roomCard" class="room-card" hidden>
+        <button id="roomCardClose" class="room-card-close" type="button" aria-label="关闭">×</button>
+        <div id="roomCardKicker" class="room-card-kicker">B栋 · 五层</div>
+        <div id="roomCardTitle" class="room-card-title">538</div>
+        <div id="roomCardSub" class="room-card-sub">教室</div>
+        <div class="room-card-actions">
+          <button id="setStartBtn" class="mini-btn" type="button">设为起点</button>
+          <button id="setEndBtn" class="mini-btn danger" type="button">设为终点</button>
+        </div>
+        <p id="roomCardNote" class="room-card-note" hidden></p>
+      </div>
+
+      <div class="viewer-hint">滚轮缩放 · 拖动平移 · 点击热点查看</div>
+      <div id="loading" class="loading">正在加载 B 栋平面图…</div>
+    </section>
+  </main>
+
+  <script src="assets/leaflet/leaflet.js"></script>
+  <script src="data/b-floorplan.js?v=20261101redgates2"></script>
+  <script src="app.js?v=20261101redgates2"></script>
+</body>
+</html>

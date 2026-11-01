@@ -152,6 +152,14 @@ function loadFloor() {
 
   history.replaceState(null, "", `#${building.id}/${floor.id}`);
   $("viewerBadge").textContent = `${building.name} · ${floorLabel(floor)}`;
+  const backValue = encodeURIComponent(`../index.html#${building.id}/${floor.id}`);
+  const bNavBanner = $("bNavBanner");
+  if (bNavBanner) {
+    bNavBanner.hidden = building.id !== "B";
+    bNavBanner.href = `b-navigation/index.html?back=${backValue}`;
+  }
+  const bNavTopLink = document.querySelector(".b-nav-toplink");
+  if (bNavTopLink) bNavTopLink.href = `b-navigation/index.html?back=${backValue}`;
   renderRoomList();
   setInfo(null);
 
@@ -218,8 +226,10 @@ function setInfo(room) {
     host.innerHTML = `<h3>房间信息</h3><p class="muted">点击平面图中的房间，或搜索房间号。</p>`;
     return;
   }
-  const isStart = state.startRef && state.startRef.room === room;
-  const isEnd = state.endRef && state.endRef.room === room;
+  const backValue = encodeURIComponent(`../index.html#${state.building.id}/${state.floor.id}`);
+  const bNavCta = state.building.id === "B" && room.type === "classroom" && room.rect
+    ? `<a class="b-nav-cta" href="b-navigation/index.html?back=${backValue}&amp;end=${encodeURIComponent(`${state.floor.id}:${room.name}`)}&amp;show=end"><span>在 B 栋导航中打开</span><span>→</span></a>`
+    : "";
   host.innerHTML = `
     <h3>房间信息</h3>
     <div class="info-room-name">${escapeHtml(room.name)}</div>
@@ -227,17 +237,11 @@ function setInfo(room) {
       <span class="info-pill">${escapeHtml(state.building.name)} · ${floorLabel(state.floor)}</span>
       <span class="info-pill">${TYPE_LABEL[room.type] || "房间"}</span>
     </div>
-    ${room.rect ? `<div class="info-actions">
-      <button type="button" class="route-btn start${isStart ? " active" : ""}" data-ref="start">设为起点</button>
-      <button type="button" class="route-btn end${isEnd ? " active" : ""}" data-ref="end">设为终点</button>
-    </div>` : ""}
     <p class="info-note">${room.rect
       ? "已定位到房间热点；橙色框为当前选中房间。"
       : "该房间暂无热点坐标。"}</p>
+    ${bNavCta}
   `;
-  host.querySelectorAll(".route-btn").forEach((btn) => {
-    btn.addEventListener("click", () => setRouteRef(btn.dataset.ref, room));
-  });
 }
 
 function renderRoomList() {
@@ -729,6 +733,9 @@ function runPlan() {
 }
 
 function bindRouteUI() {
+  // This page uses the dedicated B-building navigation instead of the old
+  // inline route panel. Keep the legacy code harmless if that panel is absent.
+  if (!$("routePlan") || !$("routeClear")) return;
   $("routePlan").addEventListener("click", runPlan);
   $("routeClear").addEventListener("click", () => {
     state.startRef = null;

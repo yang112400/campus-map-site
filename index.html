@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>南校区地图</title>
   <link rel="stylesheet" href="assets/leaflet/leaflet.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261101bnav">
 </head>
 <body>
   <header class="topbar">
@@ -17,6 +17,7 @@
       </div>
     </div>
     <div class="top-actions">
+      <a class="ghost-btn nav-link b-nav-toplink" href="b-navigation/index.html?back=../index.html">B栋导航 ↗</a>
       <button id="fitBtn" class="ghost-btn" type="button">适应屏幕</button>
       <button id="hotspotBtn" class="ghost-btn active" type="button">房间热点</button>
     </div>
@@ -76,6 +77,14 @@
     <section class="viewer-wrap">
       <div id="viewer"></div>
       <div id="viewerBadge" class="viewer-badge">加载中…</div>
+      <a id="bNavBanner" class="b-nav-banner" href="b-navigation/index.html?back=../index.html" hidden>
+        <span class="b-nav-banner-icon">B</span>
+        <span class="b-nav-banner-text">
+          <strong>B栋室内导航</strong>
+          <small>选教室 · 跨楼层 · 平面图路线</small>
+        </span>
+        <span class="b-nav-banner-arrow">→</span>
+      </a>
       <div class="viewer-hint">滚轮缩放 · 拖动平移 · 点击房间查看</div>
       <div id="loading" class="loading">正在加载平面图…</div>
     </section>
@@ -83,6 +92,6 @@
 
   <script src="assets/leaflet/leaflet.js"></script>
   <script src="assets/floorplan-20261109.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=20261101bnav"></script>
 </body>
 </html>
