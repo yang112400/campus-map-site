@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>南校区地图</title>
+  <link rel="stylesheet" href="assets/leaflet/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">西电</div>
+      <div class="brand-text">
+        <h1>南校区地图</h1>
+        <p>A / B / C / E-1 / E-2 / E-3 / F / G 栋</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="fitBtn" class="ghost-btn" type="button">适应屏幕</button>
+      <button id="hotspotBtn" class="ghost-btn active" type="button">房间热点</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="sidebar-section">
+        <div class="section-head">
+          <span>教学楼</span>
+          <span id="buildingCount" class="section-note"></span>
+        </div>
+        <div id="buildingTabs" class="building-tabs"></div>
+      </section>
+
+      <section class="sidebar-section">
+        <div class="section-head">
+          <span>楼层</span>
+          <span id="floorCount" class="section-note"></span>
+        </div>
+        <div id="floorGrid" class="floor-grid"></div>
+      </section>
+
+      <section class="sidebar-section route-section">
+        <div class="section-head">
+          <span>路线导航</span>
+          <span class="section-note">起点 → 终点</span>
+        </div>
+        <div class="route-row">
+          <span class="route-dot start"></span>
+          <b id="routeStart">未设置</b>
+        </div>
+        <div class="route-row">
+          <span class="route-dot end"></span>
+          <b id="routeEnd">未设置</b>
+        </div>
+        <div class="route-btns">
+          <button id="routePlan" class="primary-btn" type="button">规划路线</button>
+          <button id="routeClear" class="ghost-btn" type="button">清除</button>
+        </div>
+        <p id="routeInfo" class="route-info muted">点击图上房间后，用「设为起点 / 设为终点」。</p>
+      </section>
+
+      <section class="sidebar-section search-section">
+        <label class="field-label" for="searchInput">查找房间</label>
+        <div class="search-box">
+          <input id="searchInput" type="search" autocomplete="off" placeholder="输入房间号，如 528">
+        </div>
+        <div id="searchResults" class="search-results" hidden></div>
+      </section>
+
+      <section class="sidebar-section room-section">
+        <div class="section-head">
+          <span>本层房间</span>
+          <span id="roomCount" class="section-note"></span>
+        </div>
+        <div id="roomList" class="room-list"></div>
+      </section>
+
+      <section id="infoCard" class="info-card">
+        <h3>房间信息</h3>
+        <p class="muted">点击平面图中的房间，或搜索房间号。</p>
+      </section>
+
+      <section class="sidebar-section legend-section">
+        <div class="section-head">
+          <span>图例</span>
+        </div>
+        <div id="legend" class="legend"></div>
+      </section>
+
+      <p class="sidebar-footnote">
+        静态示例：A/B/E-1/E-2/E-3 栋为完整房间热点，F/C 栋为主要教室热点，G 栋为楼层图。
+      </p>
+    </aside>
+
+    <section class="viewer-wrap">
+      <div id="viewer"></div>
+      <div id="viewerBadge" class="viewer-badge">加载中…</div>
+      <div class="viewer-hint">滚轮缩放 · 拖动平移 · 点击房间查看</div>
+      <div id="loading" class="loading">正在加载平面图…</div>
+    </section>
+  </main>
+
+  <script src="assets/leaflet/leaflet.js"></script>
+  <script src="assets/floorplan.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
