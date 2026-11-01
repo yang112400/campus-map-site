@@ -13,7 +13,7 @@
       <div class="brand-mark">西电</div>
       <div class="brand-text">
         <h1>南校区地图</h1>
-        <p>A / B / C / E-1 / E-2 / E-3 / F / G 栋 / 信远1区</p>
+        <p>A / B / C / E-1 / E-2 / E-3 / F / G 栋</p>
       </div>
     </div>
     <div class="top-actions">
@@ -38,6 +38,26 @@
           <span id="floorCount" class="section-note"></span>
         </div>
         <div id="floorGrid" class="floor-grid"></div>
+      </section>
+
+      <section class="sidebar-section route-section">
+        <div class="section-head">
+          <span>路线导航</span>
+          <span class="section-note">起点 → 终点</span>
+        </div>
+        <div class="route-row">
+          <span class="route-dot start"></span>
+          <b id="routeStart">未设置</b>
+        </div>
+        <div class="route-row">
+          <span class="route-dot end"></span>
+          <b id="routeEnd">未设置</b>
+        </div>
+        <div class="route-btns">
+          <button id="routePlan" class="primary-btn" type="button">规划路线</button>
+          <button id="routeClear" class="ghost-btn" type="button">清除</button>
+        </div>
+        <p id="routeInfo" class="route-info muted">点击图上房间后，用「设为起点 / 设为终点」。</p>
       </section>
 
       <section class="sidebar-section search-section">
@@ -69,7 +89,7 @@
       </section>
 
       <p class="sidebar-footnote">
-        A/B/C/E-1/E-2/E-3/F/G 栋及信远 1 区（I）均已标注房间热点；A/B 栋另含楼梯 / 安全通道热点。
+        静态示例：A/B/E-1/E-2/E-3 栋为完整房间热点，F/C 栋为主要教室热点，G 栋为楼层图。
       </p>
     </aside>
 
@@ -82,7 +102,7 @@
   </main>
 
   <script src="assets/leaflet/leaflet.js"></script>
-  <script src="assets/floorplan.js?v=20261108stairs4"></script>
+  <script src="assets/floorplan.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

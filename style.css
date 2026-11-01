@@ -536,6 +536,91 @@ button, input { font: inherit; }
   pointer-events: none;
 }
 
+/* ===== 路线导航 ===== */
+.route-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.route-row b {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.route-row b.set { color: #0f4c5c; }
+
+.route-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.route-dot.start { background: #22c55e; }
+.route-dot.end { background: #ef4444; }
+
+.route-btns {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.primary-btn {
+  flex: 1;
+  border: 0;
+  border-radius: 8px;
+  background: #0e7490;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 9px 10px;
+  cursor: pointer;
+}
+
+.primary-btn:hover { background: #155e75; }
+
+.route-info {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.route-info.muted { color: #94a3b8; }
+.route-info.bad { color: #b91c1c; }
+.route-info.ok { color: #0f766e; }
+
+.info-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.route-btn {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  cursor: pointer;
+  color: #475569;
+}
+
+.route-btn:hover { border-color: #0e7490; color: #0e7490; }
+.route-btn.start.active { background: #dcfce7; border-color: #22c55e; color: #15803d; font-weight: 700; }
+.route-btn.end.active { background: #fee2e2; border-color: #ef4444; color: #b91c1c; font-weight: 700; }
+
 @media (max-width: 900px) {
   body {
     overflow: auto;
