@@ -819,6 +819,30 @@
       "alias": "西二楼",
       "floors": [
         {
+          "id": "2F",
+          "name": "2层",
+          "image": "assets/floors/B/2F.jpg?v=20261105b",
+          "width": 1603,
+          "height": 638,
+          "rooms": []
+        },
+        {
+          "id": "3F",
+          "name": "3层",
+          "image": "assets/floors/B/3F.jpg?v=20261105b",
+          "width": 1685,
+          "height": 558,
+          "rooms": []
+        },
+        {
+          "id": "4F",
+          "name": "4层",
+          "image": "assets/floors/B/4F.jpg?v=20261105b",
+          "width": 1404,
+          "height": 703,
+          "rooms": []
+        },
+        {
           "id": "5F",
           "name": "5层",
           "image": "assets/floors/B/5F.jpg",
