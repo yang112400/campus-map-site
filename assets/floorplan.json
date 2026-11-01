@@ -5465,49 +5465,49 @@
         {
           "id": "1F",
           "name": "1层",
-          "image": "assets/floors/G/1F.jpg",
-          "width": 837,
-          "height": 313,
+          "image": "assets/floors/G/1F.jpg?v=20261103g",
+          "width": 1958,
+          "height": 722,
           "rooms": []
         },
         {
           "id": "2F",
           "name": "2层",
-          "image": "assets/floors/G/2F.jpg",
-          "width": 837,
-          "height": 313,
+          "image": "assets/floors/G/2F.jpg?v=20261103g",
+          "width": 1999,
+          "height": 726,
           "rooms": []
         },
         {
           "id": "3F",
           "name": "3层",
-          "image": "assets/floors/G/3F.jpg",
-          "width": 837,
-          "height": 313,
+          "image": "assets/floors/G/3F.jpg?v=20261103g",
+          "width": 1999,
+          "height": 729,
           "rooms": []
         },
         {
           "id": "4F",
           "name": "4层",
-          "image": "assets/floors/G/4F.jpg",
-          "width": 756,
-          "height": 297,
+          "image": "assets/floors/G/4F.jpg?v=20261103g",
+          "width": 1859,
+          "height": 671,
           "rooms": []
         },
         {
           "id": "5F",
           "name": "5层",
-          "image": "assets/floors/G/5F.jpg",
-          "width": 756,
-          "height": 297,
+          "image": "assets/floors/G/5F.jpg?v=20261103g",
+          "width": 1916,
+          "height": 704,
           "rooms": []
         },
         {
           "id": "6F",
           "name": "6层",
-          "image": "assets/floors/G/6F.jpg",
-          "width": 756,
-          "height": 297,
+          "image": "assets/floors/G/6F.jpg?v=20261103g",
+          "width": 1197,
+          "height": 462,
           "rooms": []
         }
       ]
