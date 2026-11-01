@@ -826,16 +826,6 @@
           "height": 638,
           "rooms": [
             {
-              "name": "",
-              "type": "classroom",
-              "rect": [
-                0.068,
-                0.03918,
-                0.02558,
-                0.04232
-              ]
-            },
-            {
               "name": "219",
               "type": "classroom",
               "rect": [
