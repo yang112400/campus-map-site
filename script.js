@@ -146,8 +146,15 @@ function loadFloor() {
   state.map.fitBounds(bounds, { padding: [24, 24] });
   state.map.setMaxBounds(bounds.pad(0.35));
 
+  // 先画普通房间，再把楼梯画一遍 —— 保证楼梯永远压在最上层，不被房间矩形吞掉
   for (const room of floor.rooms) {
-    if (room.rect) addRoomLayer(room);
+    if (room.rect && room.type !== "stairs") addRoomLayer(room);
+  }
+  for (const room of floor.rooms) {
+    if (room.rect && room.type === "stairs") {
+      const layer = addRoomLayer(room);
+      if (layer && layer.bringToFront) layer.bringToFront();
+    }
   }
 
   history.replaceState(null, "", `#${building.id}/${floor.id}`);
@@ -192,6 +199,7 @@ function addRoomLayer(room) {
 
   layer.addTo(state.roomGroup);
   state.roomLayers.set(room, layer);
+  return layer;
 }
 
 function selectRoom(room) {
